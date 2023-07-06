@@ -5,6 +5,7 @@ import {DAO} from "@aragon/osx/core/dao/DAO.sol";
 import {PermissionLib} from "@aragon/osx/core/permission/PermissionLib.sol";
 import {PluginSetup, IPluginSetup} from "@aragon/osx/framework/plugin/setup/PluginSetup.sol";
 import {VetoPlugin} from "./VetoPlugin.sol";
+import {ITaxManager} from "./TaxManager.sol";
 
 /// @title VetoPluginSetup development
 contract VetoPluginSetup is PluginSetup {
@@ -22,12 +23,14 @@ contract VetoPluginSetup is PluginSetup {
         uint256 minProposerVotingPower;
     }
 
-    address private immutable vetoPluginImplementation;
+    address public immutable vetoPluginImplementation;
     address public immutable gDAO;
+    ITaxManager public immutable taxManager;
 
-    constructor(address _gDao) {
+    constructor(address _gDao, address _taxManager) {
         vetoPluginImplementation = address(new VetoPlugin());
         gDAO = _gDao;
+        taxManager = ITaxManager(_taxManager);
     }
 
     function prepareInstallation(
@@ -45,7 +48,8 @@ contract VetoPluginSetup is PluginSetup {
                 VetoPlugin.initializeBuild.selector,
                 _dao,
                 _votingSettings,
-                _token
+                _token,
+                address(taxManager)
             )
         );
 

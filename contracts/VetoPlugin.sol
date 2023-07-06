@@ -10,6 +10,7 @@ import {MajorityVotingBase} from "@aragon/osx/plugins/governance/majority-voting
 import {IMajorityVoting} from "@aragon/osx/plugins/governance/majority-voting/IMajorityVoting.sol";
 
 import {TestVotingToken} from "./TestVotingToken.sol";
+import {ITaxManager} from "./TaxManager.sol";
 
 contract VetoPlugin is MajorityVotingBase, IMembership {
     using SafeCastUpgradeable for uint256;
@@ -20,13 +21,10 @@ contract VetoPlugin is MajorityVotingBase, IMembership {
     /// @notice An [OpenZeppelin `Votes`](https://docs.openzeppelin.com/contracts/4.x/api/governance#Votes) compatible contract referencing the token being used for voting.
     TestVotingToken private votingToken;
 
-    /// @notice An tax amount which would be setted by Governance Dao
-    uint256 tax = 0;
-
-
     /// @notice Permissions
     bytes32 public constant VETO_PERMISSION_ID = keccak256("VETO_PERMISSION");
     bytes32 public constant TAX_PERMISSION_ID = keccak256("TAX_PERMISSION");
+    ITaxManager public taxManager;
 
 
     /// @notice Thrown if the voting power is zero
@@ -69,11 +67,13 @@ contract VetoPlugin is MajorityVotingBase, IMembership {
     function initializeBuild(
         IDAO _dao,
         VotingSettings calldata _votingSettings,
-        address _token
+        address _token,
+        address _taxManager
     ) external initializer {
         __MajorityVotingBase_init(_dao, _votingSettings);
 
         votingToken = TestVotingToken(_token);
+        taxManager = ITaxManager(_taxManager);
 
         emit MembershipContractAnnounced({definingContract: _token});
     }
@@ -100,6 +100,12 @@ contract VetoPlugin is MajorityVotingBase, IMembership {
     /// @inheritdoc MajorityVotingBase
     function totalVotingPower(uint256 _blockNumber) public view override returns (uint256) {
         return votingToken.getPastTotalSupply(_blockNumber);
+    }
+
+
+    function setTaxManager(address _tax) external auth(TAX_PERMISSION_ID)  returns (bool)  {
+        taxManager = ITaxManager(_tax);
+        return true;
     }
 
     /// @inheritdoc MajorityVotingBase
@@ -277,17 +283,12 @@ contract VetoPlugin is MajorityVotingBase, IMembership {
         string calldata _reference
     ) external payable {
         uint256 taxAmount = 0;
+        uint256 tax = taxManager.getTaxRate();
         if (_amount == 0) revert ZeroAmount();
         if (tax != 0) {
             taxAmount = _amount * tax / 100;
         }
         votingToken.transferFrom(msg.sender, address(this), _amount - taxAmount);
         emit Deposited(msg.sender, address(votingToken), _amount, _reference);
-    }
-
-    /// @notice Change the Tax percentage by Governance Dao
-    function changeTax(uint256 _tax) external auth(TAX_PERMISSION_ID)  {
-        emit TaxChanged(_tax, tax);
-        tax = _tax;
     }
 }

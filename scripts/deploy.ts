@@ -24,19 +24,25 @@ export function toHex(input: string): BytesLike {
   return ethers.utils.hexlify(ethers.utils.toUtf8Bytes(input));
 }
 
+const gDAO = "0xe9a758dfb55201a1c7287a8a0670a54e6c4f6ade"
+const taxManager = "0x52bd813177a90afe18f330d849B1F427483b785F"
+const maintainer = "0x57F700b3f48458756f8B955172485161eC7407A8"
 async function main() {
-  const TestVotingToken = await ethers.getContractFactory("TestVotingToken");
-  const testVotingToken = await TestVotingToken.deploy(10000000);
-  await testVotingToken.deployed();
+  // const TestVotingToken = await ethers.getContractFactory("TestVotingToken");
+  // const testVotingToken = await TestVotingToken.deploy(10000000);
+  // await testVotingToken.deployed();
+  //0x677Cc0CD8163b2967aed80b150674A58EB4c0BE6
 
-  console.log(testVotingToken.address);
+  // console.log(testVotingToken.address);
 
-  console.log(
-    `TestVotingToken contract deployed to ${testVotingToken.address}`
-  );
+  // console.log(
+  //   `TestVotingToken contract deployed to ${testVotingToken.address}`
+  // );
 
   const VetoPluginSetup = await ethers.getContractFactory("VetoPluginSetup");
-  const vetoPluginSetup = await VetoPluginSetup.deploy();
+  const vetoPluginSetup = await VetoPluginSetup.deploy(
+      gDAO, taxManager
+  );
   await vetoPluginSetup.deployed();
 
   console.log(
@@ -50,21 +56,24 @@ async function main() {
   console.log("Release metadata uploaded to ", releaseMetadata);
   const buildMetadata = await uploadToIpfs(JSON.stringify(buildMetadataUri));
   console.log("Build metadata uploaded to ", buildMetadata);
-
   // PluginSetup Deploy
   const [deployer] = await ethers.getSigners();
+  console.log('USING FACTORY: ', addresses[hre.network.name].PluginRepoFactory, hre.network.name)
   const pluginRepoFactory = PluginRepoFactory__factory.connect(
-    addresses.polygon.PluginRepoFactory,
-    deployer
+      addresses[hre.network.name].PluginRepoFactory,
+      deployer
   );
-  console.log("deploying plugin repo factory");
+  console.log("deploying plugin repo factory", vetoPluginSetup.address);
+  console.log("deploying plugin repo factory ipfs hex", toHex(releaseMetadata),
+      toHex(buildMetadata));
+  return;
+
   const tx = await pluginRepoFactory.createPluginRepoWithFirstVersion(
-    "aithon",
-    VetoPluginSetup.address,
-    // "0xBAB8177FDABF43076cdBb46175f5277AF1d5680B",
-    "0x4711294a54bfd1dc53e051e532af216ef54b1023",
-    toHex(releaseMetadata),
-    toHex(buildMetadata)
+      "veto-v3",
+      vetoPluginSetup.address,
+      maintainer,
+      toHex(releaseMetadata),
+      toHex(buildMetadata)
   );
 
   console.log(tx.hash);
@@ -73,8 +82,8 @@ async function main() {
 
   console.log(receipt.transactionHash);
 
-  // await verifyContract(testVotingToken.address, [10000000]);
-  // await verifyContract(vetoPluginSetup.address);
+  await verifyContract(testVotingToken.address, [10000000]);
+  await verifyContract(vetoPluginSetup.address, [gDAO, taxManager]);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

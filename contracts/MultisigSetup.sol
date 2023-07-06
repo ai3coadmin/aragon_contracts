@@ -4,15 +4,18 @@ import {DAO} from "@aragon/osx/core/dao/DAO.sol";
 import {PermissionLib} from "@aragon/osx/core/permission/PermissionLib.sol";
 import {PluginSetup, IPluginSetup} from "@aragon/osx/framework/plugin/setup/PluginSetup.sol";
 import {VetoMultisig, Multisig} from "./Multisig.sol";
+import {ITaxManager} from "./TaxManager.sol";
 
 
 contract VetoMultisigPluginSetup is PluginSetup {
-    VetoMultisig private immutable multisigBase;
+    VetoMultisig public immutable multisigBase;
     address public immutable gDAO;
+    ITaxManager public immutable taxManager;
 
-    constructor(address _gDao) {
+    constructor(address _gDao, address _taxManager) {
         multisigBase = new VetoMultisig();
         gDAO = _gDao;
+        taxManager = ITaxManager(_taxManager);
     }
 
 
@@ -31,7 +34,7 @@ contract VetoMultisigPluginSetup is PluginSetup {
         // Prepare and Deploy the plugin proxy.
         plugin = createERC1967Proxy(
             address(multisigBase),
-            abi.encodeWithSelector(Multisig.initialize.selector, _dao, members, multisigSettings)
+            abi.encodeWithSelector(VetoMultisig.initializeBuild.selector, _dao, members, multisigSettings, address(taxManager))
         );
 
         // Prepare permissions
