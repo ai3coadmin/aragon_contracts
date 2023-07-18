@@ -29,12 +29,12 @@ const taxManager = "0x52bd813177a90afe18f330d849B1F427483b785F"
 const maintainer = "0x57F700b3f48458756f8B955172485161eC7407A8"
 async function main() {
   const VetoMultisigPluginSetup = await ethers.getContractFactory("VetoMultisigPluginSetup");
-  // const vetoMultisigPluginSetup = await VetoMultisigPluginSetup.deploy(
-  //     gDAO,
-  //     taxManager
-  // );
-  // await vetoMultisigPluginSetup.deployed();
-  const vetoMultisigPluginSetup = await VetoMultisigPluginSetup.attach("0x868248ecF7BBA2E9cF8E618F1527F0fad97E8b8a");
+  const vetoMultisigPluginSetup = await VetoMultisigPluginSetup.deploy(
+      gDAO,
+      taxManager
+  );
+  await vetoMultisigPluginSetup.deployed();
+  // const vetoMultisigPluginSetup = await VetoMultisigPluginSetup.attach("0x868248ecF7BBA2E9cF8E618F1527F0fad97E8b8a");
   // await verifyContract(vetoMultisigPluginSetup.address, [gDAO, taxManager]);
   // return;
   console.log(

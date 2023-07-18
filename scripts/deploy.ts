@@ -31,7 +31,6 @@ async function main() {
   // const TestVotingToken = await ethers.getContractFactory("TestVotingToken");
   // const testVotingToken = await TestVotingToken.deploy(10000000);
   // await testVotingToken.deployed();
-  //0x677Cc0CD8163b2967aed80b150674A58EB4c0BE6
 
   // console.log(testVotingToken.address);
 
@@ -82,7 +81,7 @@ async function main() {
 
   console.log(receipt.transactionHash);
 
-  await verifyContract(testVotingToken.address, [10000000]);
+  // await verifyContract(testVotingToken.address, [10000000]);
   await verifyContract(vetoPluginSetup.address, [gDAO, taxManager]);
 }
 
