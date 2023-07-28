@@ -27,3 +27,7 @@ change the subdomain if required currently is 'veto-v3' & 'veto-multisig-v2', if
 npx hardhat run --network mumbai scripts/deploy.ts
 npx hardhat run --network mumbai scripts/deploy-multisig.ts
 ```
+
+
+VetoPluginSetup contract deployed to 0x40bC837b9cFc2C6fd9937F9119A69E809e0183d0
+VetoMultisigPluginSetup contract deployed to 0x4D92efdB9EFCA73CAe4076d8331ef46830b680a9

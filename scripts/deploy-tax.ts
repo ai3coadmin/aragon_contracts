@@ -17,7 +17,7 @@ async function main() {
   const TaxManager = await ethers.getContractFactory("TaxManager");
   const taxManager = await TaxManager.deploy();
   await taxManager.deployed();
-  // const taxManager = await TaxManager.attach("0x52bd813177a90afe18f330d849B1F427483b785F");
+  // const taxManager = await TaxManager.attach("0x7e5e585dec84e2618ea5aea1d5c0a18ddd0ade23");
   await verifyContract(taxManager.address, []);
   // return;
   console.log(taxManager.address);

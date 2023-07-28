@@ -24,17 +24,17 @@ export function toHex(input: string): BytesLike {
   return ethers.utils.hexlify(ethers.utils.toUtf8Bytes(input));
 }
 
-const gDAO = "0xe9a758dfb55201a1c7287a8a0670a54e6c4f6ade"
-const taxManager = "0x52bd813177a90afe18f330d849B1F427483b785F"
+const gDAO = "0x7d8b38b139cb4a222085b39faaacf960d62453b1"
+const taxManager = "0x7e5e585dec84e2618ea5aea1d5c0a18ddd0ade23"
 const maintainer = "0x57F700b3f48458756f8B955172485161eC7407A8"
 async function main() {
   const VetoMultisigPluginSetup = await ethers.getContractFactory("VetoMultisigPluginSetup");
-  const vetoMultisigPluginSetup = await VetoMultisigPluginSetup.deploy(
-      gDAO,
-      taxManager
-  );
-  await vetoMultisigPluginSetup.deployed();
-  // const vetoMultisigPluginSetup = await VetoMultisigPluginSetup.attach("0x868248ecF7BBA2E9cF8E618F1527F0fad97E8b8a");
+  // const vetoMultisigPluginSetup = await VetoMultisigPluginSetup.deploy(
+  //     gDAO,
+  //     taxManager
+  // );
+  // await vetoMultisigPluginSetup.deployed();
+  const vetoMultisigPluginSetup = await VetoMultisigPluginSetup.attach("0x4D92efdB9EFCA73CAe4076d8331ef46830b680a9");
   // await verifyContract(vetoMultisigPluginSetup.address, [gDAO, taxManager]);
   // return;
   console.log(
@@ -60,7 +60,7 @@ async function main() {
   console.log("deploying plugin repo factory ipfs hex", toHex(releaseMetadata),
       toHex(buildMetadata));
   const tx = await pluginRepoFactory.createPluginRepoWithFirstVersion(
-    "veto-multisig-v2",
+    "veto-multisig",
       vetoMultisigPluginSetup.address,
     maintainer,
     toHex(releaseMetadata),

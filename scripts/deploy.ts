@@ -24,8 +24,8 @@ export function toHex(input: string): BytesLike {
   return ethers.utils.hexlify(ethers.utils.toUtf8Bytes(input));
 }
 
-const gDAO = "0xe9a758dfb55201a1c7287a8a0670a54e6c4f6ade"
-const taxManager = "0x52bd813177a90afe18f330d849B1F427483b785F"
+const gDAO = "0x7d8b38b139cb4a222085b39faaacf960d62453b1"
+const taxManager = "0x7e5e585dec84e2618ea5aea1d5c0a18ddd0ade23"
 const maintainer = "0x57F700b3f48458756f8B955172485161eC7407A8"
 async function main() {
   // const TestVotingToken = await ethers.getContractFactory("TestVotingToken");
@@ -37,10 +37,19 @@ async function main() {
   // console.log(
   //   `TestVotingToken contract deployed to ${testVotingToken.address}`
   // );
+  console.log(
+      `VetoPluginSetup Deploying...`
+  );
 
   const VetoPluginSetup = await ethers.getContractFactory("VetoPluginSetup");
+  console.log(
+      `VetoPluginSetup getContractFactory`
+  );
   const vetoPluginSetup = await VetoPluginSetup.deploy(
       gDAO, taxManager
+  );
+  console.log(
+      `VetoPluginSetup vetoPluginSetup ${vetoPluginSetup.address}`
   );
   await vetoPluginSetup.deployed();
 
@@ -65,10 +74,9 @@ async function main() {
   console.log("deploying plugin repo factory", vetoPluginSetup.address);
   console.log("deploying plugin repo factory ipfs hex", toHex(releaseMetadata),
       toHex(buildMetadata));
-  return;
 
   const tx = await pluginRepoFactory.createPluginRepoWithFirstVersion(
-      "veto-v3",
+      "veto-token",
       vetoPluginSetup.address,
       maintainer,
       toHex(releaseMetadata),
